@@ -11,7 +11,7 @@ public class Actions
     [Action("Load document", Description = "Load document's text. Document must be in docx/doc, pdf or txt format.")]
     public async Task<LoadDocumentResponse> LoadDocument([ActionParameter] LoadDocumentRequest request)
     {
-        var text = await DocumentReader.ReadDocument(request.File, request.Filename);
+        var text = await DocumentReader.ReadDocument(request.File.Bytes, request.File.Name);
         return new LoadDocumentResponse { Text = text };
     }
 

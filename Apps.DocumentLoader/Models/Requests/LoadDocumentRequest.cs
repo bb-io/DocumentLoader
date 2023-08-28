@@ -1,7 +1,8 @@
-﻿namespace Apps.DocumentLoader.Models.Requests;
+﻿using File = Blackbird.Applications.Sdk.Common.Files.File;
+
+namespace Apps.DocumentLoader.Models.Requests;
 
 public class LoadDocumentRequest
 {
-    public string Filename { get; set; }
-    public byte[] File { get; set; }
+    public File File { get; set; }
 }
