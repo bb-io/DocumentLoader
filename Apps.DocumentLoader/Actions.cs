@@ -1,9 +1,13 @@
 ﻿using System.Net.Mime;
 using System.Text;
+using System.Xml;
+using System.Xml.Linq;
 using Apps.DocumentLoader.Models.Requests;
 using Apps.DocumentLoader.Models.Responses;
 using Blackbird.Applications.Sdk.Common;
 using Blackbird.Applications.Sdk.Common.Actions;
+using DocumentFormat.OpenXml;
+using DocumentFormat.OpenXml.Spreadsheet;
 using File = Blackbird.Applications.Sdk.Common.Files.File;
 
 namespace Apps.DocumentLoader;
@@ -53,5 +57,57 @@ public class Actions
                 ContentType = MediaTypeNames.Application.Octet
             }
         };
+    }
+
+    [Action("Change XML file property", Description = "Change XML file property")]
+    public async Task<ConvertTextToDocumentResponse> ChangeXML([ActionParameter] ChangeXMLRequest request)
+    {
+        using(MemoryStream streamIn = new MemoryStream(request.File.Bytes))
+        {
+            XDocument doc = XDocument.Load(streamIn);
+            var items = doc.Root.Descendants(request.Property);
+
+            foreach (var itemElement in items)
+            {
+                itemElement.Value = request.Value;
+            }
+            using (MemoryStream streamOut = new MemoryStream())
+            {
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.OmitXmlDeclaration = true;
+                settings.Indent = true;
+                XmlWriter writer = XmlWriter.Create(streamOut, settings);
+                doc.Save(writer);
+                writer.Flush();
+                return new ConvertTextToDocumentResponse { 
+                    File = new File(streamOut.ToArray())
+                    {
+                        ContentType = request.File.ContentType,
+                        Name = request.File.Name
+                    }
+                };
+            }
+        } 
+    }
+
+    [Action("Get XML file property", Description = "Get XML file property")]
+    public async Task<GetXMLPropertyResponse> GetXMLProperty([ActionParameter] GetXMLPropertyRequest request)
+    {
+        using (MemoryStream streamIn = new MemoryStream(request.File.Bytes))
+        {
+            XDocument doc = XDocument.Load(streamIn);
+            var items = doc.Root.Descendants(request.Property);
+            return new GetXMLPropertyResponse() { Value = items.FirstOrDefault().Value };
+        }
+    }
+
+    [Action("Bump version string", Description = "Bump version string")]
+    public async Task<GetXMLPropertyResponse> BumpVersionString([ActionParameter] BumpVersionStringRequest request)
+    {
+        Version version = Version.Parse(request.VersionString);
+        int major = request.VersionType == "major" ? version.Major + 1 : version.Major;
+        int minor = request.VersionType == "minor" ? version.Minor + 1 : version.Minor;
+        int patch = request.VersionType == "patch" ? version.Build + 1 : version.Build;
+        return new GetXMLPropertyResponse() { Value = $"{major}.{minor}.{patch}" };
     }
 }
