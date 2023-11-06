@@ -1,5 +1,6 @@
 ﻿using System.Net.Mime;
 using System.Text;
+using System.Xml;
 using System.Xml.Linq;
 using Apps.DocumentLoader.Models.Requests;
 using Apps.DocumentLoader.Models.Responses;
@@ -70,9 +71,14 @@ public class Actions
             {
                 itemElement.Value = request.Value;
             }
-            using (MemoryStream streamOut = new MemoryStream(request.File.Bytes))
+            using (MemoryStream streamOut = new MemoryStream())
             {
-                doc.Save(streamOut);
+                XmlWriterSettings settings = new XmlWriterSettings();
+                settings.OmitXmlDeclaration = true;
+                settings.Indent = true;
+                XmlWriter writer = XmlWriter.Create(streamOut, settings);
+                doc.Save(writer);
+                writer.Flush();
                 return new ConvertTextToDocumentResponse { 
                     File = new File(streamOut.ToArray())
                     {
