@@ -1,13 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿namespace Apps.DocumentLoader.Models.Responses;
 
-namespace Apps.DocumentLoader.Models.Responses
+public class GetXMLPropertyResponse
 {
-    public class GetXMLPropertyResponse
-    {
-        public string Value { get; set; }
-    }
+    public string Value { get; set; }
 }
