@@ -1,16 +1,10 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using File = Blackbird.Applications.Sdk.Common.Files.File;
+﻿using Blackbird.Applications.Sdk.Common.Files;
 
-namespace Apps.DocumentLoader.Models.Requests
+namespace Apps.DocumentLoader.Models.Requests;
+
+public class GetXMLPropertyRequest
 {
-    public class GetXMLPropertyRequest
-    {
-        public File File { get; set; }
+    public FileReference File { get; set; }
 
-        public string Property { get; set; }
-    }
+    public string Property { get; set; }
 }
